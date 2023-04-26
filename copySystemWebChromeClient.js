@@ -3,7 +3,6 @@ const path = require("path");
 
 module.exports = function copyFile({ hook, opts }) {
   const { projectRoot } = opts;
-  console.log("Copying SystemWebChromeClient.java", hook, projectRoot);
 
   const sourceFile = "./SystemWebChromeClient.java";
   const destination =
@@ -11,6 +10,5 @@ module.exports = function copyFile({ hook, opts }) {
 
   // Create any missing directories in the destination path
   const dirname = path.resolve(projectRoot, destination);
-  console.log({ dirname });
-  fs.copyFileSync(sourceFile, destination);
+  fs.copyFileSync(sourceFile, dirname);
 };
