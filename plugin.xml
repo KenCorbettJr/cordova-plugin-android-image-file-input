@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-android-image-file-input" version="1.0.0">
+    <name>Cordova Plugin Android Image File Input</name>
+    <description>A small plugin that allows file inputs for images to select from either the camera or the user's files.</description>
+    <license>MIT</license>
+
+    <!-- Android -->
+    <platform name="android">
+        <hook type="after_platform_add" src="copySystemWebChromeClient.js" />
+
+        <source-file src="opener_paths.xml" target-dir="res/xml" />
+        <config-file target="AndroidManifest.xml" parent="application">
+            <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.provider" android:exported="false" android:grantUriPermissions="true">
+                <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/opener_paths" />
+            </provider>
+        </config-file>
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        </config-file>
+    </platform>
+</plugin>
