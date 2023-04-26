@@ -1,7 +1,11 @@
 
 /*
 In order to get the file input to work correctly and allow you to add pictures from your
-camera, you need this updated SystemWebChromeClient.  First copy it to the right location:
+camera, you need this updated SystemWebChromeClient. It is a modified version of the
+SystemWebChromeClient.java file from the cordova-android repo. The only change is the
+an updated onFileChooser method that allows you to add pictures from your camera.
+
+This plugin automatically copies this file to the right location.  Essentially:
 
 cp SystemWebChromeClient.java platforms/android/CordovaLib/src/org/apache/cordova/engine
 
@@ -32,19 +36,17 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
-import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.os.Build;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions.Callback;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -321,26 +323,37 @@ public class SystemWebChromeClient extends WebChromeClient {
                 public void onActivityResult(int requestCode, int resultCode, Intent intent) {
                     // Handle result
                     Uri[] result = null;
-                    if (resultCode == Activity.RESULT_OK && intent != null) {
-                        if (intent.getClipData() != null) {
-                            // handle multiple-selected files
-                            final int numSelectedFiles = intent.getClipData().getItemCount();
-                            result = new Uri[numSelectedFiles];
-                            for (int i = 0; i < numSelectedFiles; i++) {
-                                result[i] = intent.getClipData().getItemAt(i).getUri();
-                                LOG.d(LOG_TAG, "Receive file chooser URL: " + result[i]);
+                    if (resultCode == Activity.RESULT_OK) {
+                        List<Uri> uris = new ArrayList<Uri>();
+                        if (intent == null && captureUri != null) { // camera
+                            LOG.v(LOG_TAG, "Adding camera capture: " + captureUri);
+                            uris.add(captureUri);
+                        } else if (intent.getClipData() != null) { // multiple files
+                            ClipData clipData = intent.getClipData();
+                            int count = clipData.getItemCount();
+                            for (int i = 0; i < count; i++) {
+                                Uri uri = clipData.getItemAt(i).getUri();
+                                LOG.v(LOG_TAG, "Adding file (multiple): " + uri);
+                                if (uri != null) {
+                                    uris.add(uri);
+                                }
                             }
-                        } else if (intent.getData() != null) {
-                            // handle single-selected file
-                            result = WebChromeClient.FileChooserParams.parseResult(resultCode, intent);
-                            LOG.d(LOG_TAG, "Receive file chooser URL: " + result);
+
+                        } else if (intent.getData() != null) { // single file
+                            LOG.v(LOG_TAG, "Adding file (single): " + intent.getData());
+                            uris.add(intent.getData());
+                        }
+
+                        if (!uris.isEmpty()) {
+                            LOG.d(LOG_TAG, "Receive file chooser URL: " + uris.toString());
+                            result = uris.toArray(new Uri[uris.size()]);
                         }
                     }
                     filePathsCallback.onReceiveValue(result);
                 }
             }, chooserIntent, FILECHOOSER_RESULTCODE);
         } catch (ActivityNotFoundException e) {
-            LOG.w("No activity found to handle file chooser intent.", e);
+            LOG.w(LOG_TAG, "No activity found to handle file chooser intent.", e);
             filePathsCallback.onReceiveValue(null);
         }
         return true;

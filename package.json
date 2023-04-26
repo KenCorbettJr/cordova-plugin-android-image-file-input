@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-android-image-file-input",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A small plugin that allows file inputs for images to select from either the camera or the user's files.",
   "main": "index.js",
   "scripts": {},
