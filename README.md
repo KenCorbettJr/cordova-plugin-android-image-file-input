@@ -1,5 +1,7 @@
 # cordova-plugin-android-image-file-input
 
+[![https://nodei.co/npm/cordova-plugin-android-image-file-input.png?downloads=true&downloadRank=true&stars=true](https://nodei.co/npm/cordova-plugin-android-image-file-input.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/cordova-plugin-android-image-file-input)
+
 This is a tiny cordova plugin thats only purpose is to help the file input
 element work like it does on the mobile web, when within a Cordova app.
 
